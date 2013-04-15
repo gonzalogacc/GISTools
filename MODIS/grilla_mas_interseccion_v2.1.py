@@ -11,14 +11,12 @@
 """
 EJECUTAR (todo en la misma linea):
 
-python grilla_mas_interseccion_v2.1.py <shape_mascara> <shape_salida> <umbral_completitud> <tamanio_pixel> <ulx> <uly>
+python grilla_mas_interseccion_v2.1.py <shape_mascara> <shape_salida> <umbral_completitud> <tamanio_pixel>
 
 /media/docs/josecla/donmario/area_estudio/area_estudio_dissolve.shp		# archivo shape mascara
 /media/docs/josecla/donmario/area_estudio/grillas/MOD_1km				# archivo shape de salida
 0.75																	# umbral de completud de pixel
 926.625433139															# tamanyo de pixel en x e y (x=y)
--7783653.638365999795496												# coordenada x del upperleft
-0																		# coordenada y del upperleft
 
 """
 
@@ -40,11 +38,10 @@ dim_x = dim_y = float(sys.argv[4])
 
 ########################################################################
 ## LEFT
-#~ x_inicial = 0.004166666
-x_inicial = float(sys.argv[5])
+x_inicial = 0
+
 ## TOP
-#~ y_inicial = 0.004166666
-y_inicial = float(sys.argv[6])
+y_inicial = 0
 
 ########################################################################
 ## Creacion del archivo
@@ -117,26 +114,26 @@ def offsets(feature):
     ymax = int((y_inicial - limites[3]) / dim_y) + 1
 
     return xmin, ymin, xmax, ymax
+
+if __name__ == '__main__':
+    cont = 1
+    for poligono in plantilla:
+	    print 'Procesado poligono %d de %d' %(cont, len(plantilla))
+	    geom_feat = poligono.GetGeometryRef()
+	    xmin, ymin, xmax, ymax = offsets(poligono)
+
+	    rango_x = range(xmax, xmin)
+	    rango_y = range(ymax, ymin)
 	
-cont = 1
-for poligono in plantilla:
-	print 'Procesado poligono %d de %d' %(cont, len(plantilla))
-	geom_feat = poligono.GetGeometryRef()
-	xmin, ymin, xmax, ymax = offsets(poligono)
-	##print geom_feat
-	rango_x = range(xmax, xmin)
-	rango_y = range(ymax, ymin)
-	
-	for x in rango_x:
+	    for x in rango_x:
 		
-		for y in rango_y:
+		    for y in rango_y:
+		        wkt_geom = wkt_celda(x,y)
+    			geom_celda = ogr.CreateGeometryFromWkt(wkt_geom)
 			
-			wkt_geom = wkt_celda(x,y)
-			geom_celda = ogr.CreateGeometryFromWkt(wkt_geom)
-			
-			if interseccion(geom_celda, geom_feat, proporcion_dentro) == True:
+	    		if interseccion(geom_celda, geom_feat, proporcion_dentro) == True:
 				escribir_celda(lyr_grilla, geom_celda)
-	cont += 1
+    	cont += 1
 
 """
 ######### PENDIENTES ############
