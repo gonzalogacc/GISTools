@@ -133,7 +133,7 @@ if __name__ == '__main__':
 			
 	    		if interseccion(geom_celda, geom_feat, proporcion_dentro) == True:
 				escribir_celda(lyr_grilla, geom_celda)
-    	cont += 1
+            cont += 1
 
 """
 ######### PENDIENTES ############
