@@ -50,9 +50,13 @@ ruta_resultados = sys.argv[2]
 
 
 def listar_archivos(ruta):
-	'''
+	"""
 	Lista recursivamente los archivos contenidos en ruta
-	'''
+
+    Argumentos
+    -----------------
+    ruta: Ruta al directorio donde estan los archivos a listar
+	"""
 	import os
 		
 	lista_rutas = []
@@ -68,6 +72,14 @@ def listar_archivos(ruta):
 	return lista_rutas
 
 def metadata_de_dataset(imagen):
+	"""
+	Devuelve los metadatos de georreferencia y estructura de la imagen dado uin archivo de imagen
+
+	Argumentos
+	------------------------
+	imagen: Imagen de la que se quiere importar la info
+
+	"""
 	imagen_entrada = imagen
 	
 	## EXTRAE DATOS DEL ARCHIVO DE ENTRADA:
@@ -107,7 +119,7 @@ def array_de_dataset(imagen, nro_banda, cuadro=False):
 
 def stack_job(ruta_sal, rutas_en, driver_nom='GTiff', tipo_dato=GDT_Float32):
 	
-	print 
+	print
 	for i in rutas_en:
 		print i
 	print '	->', ruta_sal
