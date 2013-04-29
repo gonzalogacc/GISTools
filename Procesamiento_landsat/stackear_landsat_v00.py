@@ -13,13 +13,13 @@ python ruta_script ruta_imagenes ruta_resultados 'ubicacion primer caracter de n
 
 EJEMPLO:
 python /media/GUINDOWS_XP/IMAGENES/Landsat/tmp/stackear_landsat_v00.py
-/media/GUINDOWS_XP/IMAGENES/Landsat/tmp			# ruta donde se descomprimieron todas las bandas de todas las escenas
-/media/GUINDOWS_XP/IMAGENES/Landsat/tmp/STACKS	# ruta donde se ubicaran los stacks resultado
+/media/GUINDOWS_XP/IMAGENES/Landsat/ORIGEN		# ruta donde se descomprimieron todas las bandas de todas las escenas
+/media/GUINDOWS_XP/IMAGENES/Landsat/DESTINO		# ruta donde se ubicaran los stacks resultado
 '23,1' 											# el nro de banda se encuentra en el caracter nro 23 del nombre de las imagenes. Ocupa un solo caracter, ej: '1' (si fuera '01', ocupa dos caracteres)
 '3,4,5'											# bandas 3, 4 y 5
 
 LO ANTERIOR DEBERIA EJECUTARSE EN UNA MISMA LINEA, ENTONCES:
-python /media/GUINDOWS_XP/IMAGENES/Landsat/tmp/stackear_landsat_v00.py /media/GUINDOWS_XP/IMAGENES/Landsat/tmp /media/GUINDOWS_XP/IMAGENES/Landsat/tmp/STACKS '23,1' '3,4,5'
+python /media/GUINDOWS_XP/IMAGENES/Landsat/tmp/stackear_landsat_v00.py /media/GUINDOWS_XP/IMAGENES/Landsat/ORIGEN /media/GUINDOWS_XP/IMAGENES/Landsat/DESTINO '23,1' '3,4,5'
 
 
 ########################################################################
@@ -117,7 +117,7 @@ def array_de_dataset(imagen, nro_banda, cuadro=False):
 	
 	return matriz
 
-def stack_job(ruta_sal, rutas_en, driver_nom='GTiff', tipo_dato=GDT_Float32):
+def stack_job(ruta_sal, rutas_en, driver_nom='GTiff', tipo_dato=GDT_Int16):
 	
 	print
 	for i in rutas_en:
