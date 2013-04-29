@@ -53,9 +53,9 @@ def listar_archivos(ruta):
 	"""
 	Lista recursivamente los archivos contenidos en ruta
 
-    Argumentos
-    -----------------
-    ruta: Ruta al directorio donde estan los archivos a listar
+	Argumentos
+	-----------------
+	ruta: Ruta al directorio donde estan los archivos a listar
 	"""
 	import os
 		
