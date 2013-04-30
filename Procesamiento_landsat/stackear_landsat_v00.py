@@ -15,7 +15,6 @@ EJEMPLO:
 python /media/GUINDOWS_XP/IMAGENES/Landsat/tmp/stackear_landsat_v00.py
 /media/GUINDOWS_XP/IMAGENES/Landsat/ORIGEN		# ruta donde se descomprimieron todas las bandas de todas las escenas
 /media/GUINDOWS_XP/IMAGENES/Landsat/DESTINO		# ruta donde se ubicaran los stacks resultado
-
 '345'											# bandas 3, 4 y 5 (En el estack final estan ordenadas de menor a mayor)
 
 LO ANTERIOR DEBERIA EJECUTARSE EN UNA MISMA LINEA, ENTONCES:
