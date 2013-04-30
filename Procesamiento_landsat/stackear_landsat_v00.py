@@ -193,7 +193,7 @@ def filtrarArchivosImagenes (ruta):
 	"""
 	
 	extensiones = ['*.TIF', '*.TIFF', '*.tiff', '*.tif']	
-	lista_archivos = []
+	lista_archivos = listar_archivos(ruta)
 	for ext in extensiones:
 		lista_archivos.extend(filtroArchivos(ext))
 	return lista_archivos
