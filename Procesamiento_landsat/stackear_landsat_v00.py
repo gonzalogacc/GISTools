@@ -46,8 +46,7 @@ def listar_archivos(ruta):
 	
 		for archivo in archivos:
 			lista_rutas.append(os.path.join(dirpath, archivo))
-	
-	lista_rutas.sort()
+	##print lista_rutas
 	return lista_rutas
 
 def metadata_de_dataset(imagen):
@@ -179,7 +178,7 @@ def setImagenes (lista_imagenes):
 	"""
 	nombre_escenas = []
 	for imagen in lista_imagenes:
-		nombre_escenas.append(imagen.split('_')[0])
+		nombre_escenas.append(imagen.split('_')[0]) ## --> corregir esto no en todas las imagenes es igual
 	return list(set(nombre_escenas))
 
 def filtrarArchivosImagenes (ruta):
