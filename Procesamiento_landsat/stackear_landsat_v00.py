@@ -1,4 +1,4 @@
-'''
+"""
 ########################################################################
 ####### INSTRUCCIONES DE USO ###########################################
 ########################################################################
@@ -9,45 +9,27 @@
 
 2) en bash (linea de comandos Linux), ejecutar la orden:
 
-python ruta_script ruta_imagenes ruta_resultados 'ubicacion primer caracter de nro de banda, cantidad de caracteres para nro de banda' 'banda deseada1, banda deseada2, banda deseada n'
+python ruta_script ruta_imagenes ruta_resultados <banda deseada1><banda deseada2><banda deseada n>
 
 EJEMPLO:
 python /media/GUINDOWS_XP/IMAGENES/Landsat/tmp/stackear_landsat_v00.py
 /media/GUINDOWS_XP/IMAGENES/Landsat/ORIGEN		# ruta donde se descomprimieron todas las bandas de todas las escenas
 /media/GUINDOWS_XP/IMAGENES/Landsat/DESTINO		# ruta donde se ubicaran los stacks resultado
-'23,1' 											# el nro de banda se encuentra en el caracter nro 23 del nombre de las imagenes. Ocupa un solo caracter, ej: '1' (si fuera '01', ocupa dos caracteres)
-'3,4,5'											# bandas 3, 4 y 5
+
+'345'											# bandas 3, 4 y 5 (En el estack final estan ordenadas de menor a mayor)
 
 LO ANTERIOR DEBERIA EJECUTARSE EN UNA MISMA LINEA, ENTONCES:
-python /media/GUINDOWS_XP/IMAGENES/Landsat/tmp/stackear_landsat_v00.py /media/GUINDOWS_XP/IMAGENES/Landsat/ORIGEN /media/GUINDOWS_XP/IMAGENES/Landsat/DESTINO '23,1' '3,4,5'
-
-
-########################################################################
-########################################################################
-########################################################################
-'''
+python /media/GUINDOWS_XP/IMAGENES/Landsat/tmp/stackear_landsat_v00.py /media/GUINDOWS_XP/IMAGENES/Landsat/ORIGEN /media/GUINDOWS_XP/IMAGENES/Landsat/DESTINO 345
 
 ########################################################################
-######### 	ENTRADAS		############################################
-########################################################################
-
-extensiones = ['.TIF', '.TIFF', '.tiff', 'tif']
-
-########################################################################
-########################################################################
-########################################################################
+"""
 
 import sys
 import os
 from osgeo import gdal
 from osgeo import *
 from osgeo.gdalconst import *
-
-pos = [int(sys.argv[3].split(',')[0]),int(sys.argv[3].split(',')[1])]
-bandas = sys.argv[4].split(',')
-ruta_actual = sys.argv[1]
-ruta_resultados = sys.argv[2]
-
+import glob
 
 def listar_archivos(ruta):
 	"""
@@ -57,16 +39,14 @@ def listar_archivos(ruta):
 	-----------------
 	ruta: Ruta al directorio donde estan los archivos a listar
 	"""
-	import os
 		
 	lista_rutas = []
 	for carpeta in os.walk(ruta):
-		dire = carpeta[0]
+		dirpath = carpeta[0]
 		archivos = carpeta[2]
 	
-		for arch in archivos:
-			a = dire + '/' + arch
-			lista_rutas.append(a)
+		for archivo in archivos:
+			lista_rutas.append(os.path.join(dirpath, archivo))
 	
 	lista_rutas.sort()
 	return lista_rutas
@@ -92,12 +72,28 @@ def metadata_de_dataset(imagen):
 	return georef, projref, nro_bandas, x_size, y_size
 
 def array_de_archivo(ruta, nro_banda, cuadro=False):
+	"""
+	Devuelve un array (numpy) dado un archivo y una banda seleccionada
+
+	Argumentos
+	---------------------
+	ruta: string de la ruta al ARCHIVO
+	nro_banda: entero de la banda que se quiere extraer
+	"""
 		
 	imagen = gdal.Open(ruta)
 
 	return array_de_dataset(imagen, nro_banda, cuadro)
 
 def array_de_dataset(imagen, nro_banda, cuadro=False):
+	"""
+	Devuelve un arreglo de numpy dado un objeto de archivo de gdal y un numero de banda
+
+	Argumentos
+	-------------------
+	imagen: objeto de gdal de la imagen
+	nro_banda: entero de la banda que se quiere extraer
+	"""
 		
 	layer=imagen.GetRasterBand(nro_banda)
 	
@@ -118,6 +114,18 @@ def array_de_dataset(imagen, nro_banda, cuadro=False):
 	return matriz
 
 def stack_job(ruta_sal, rutas_en, driver_nom='GTiff', tipo_dato=GDT_Int16):
+	"""
+	Devuelve un stack en el formato especificado dada una ruta al directorio donde estan las imagenes
+	que se quieren apilar
+
+	Argumentos:
+	----------------------
+	ruta_sal: string de la ruta final del archivo
+	rutas_en: iterable con las rutas a las bandas para armar la imagen
+	driver_nom: Formato gdal del archivo de salida
+	tipo_dato: tipo de datos en formato gdal
+
+	"""
 	
 	print
 	for i in rutas_en:
@@ -147,64 +155,79 @@ def stack_job(ruta_sal, rutas_en, driver_nom='GTiff', tipo_dato=GDT_Int16):
 	img_sal = None
 	del img_sal
 
-
-########################################################################
-########################################################################
-########################################################################
-
-os.chdir(ruta_actual)
-
-lista_archivos = listar_archivos(ruta_actual)
-
-### CREAR DICCIONARIO CON NOMBRE Y UBICACION DE CADA BANDA LANDSAT:
-dic_imagenes = {}
-for r in lista_archivos:
-	nombreimagen = r.split('/')[-1]
+## Expresion regular para machear los tif (funcion agregada documentar)
+def filtroArchivos (regex):
+	""" 
+	Devuelve un iterable de los archivos del directorio que satisfacen 
+	la expresion regular planteada, puede devolver una lista vacia 
+	ES CASE SENSITIVE!!!
 	
-	igual = False
-	for ex in extensiones:
-		if nombreimagen[-len(ex):] == ex:
-			igual = True
+	Argumentos
+	------------------------
+	regex: Expresion regular que coincide con las extensiones de los archivos, no es case sensitive, no es necesario aca
 	
-	# SI ES UN ARCHIVO DE IMAGEN, LO AGREGA A LA LISTA
-	if igual:
-		dic_imagenes[nombreimagen] = r
-### ===
+	"""
+	return glob.glob(regex)
 
 
-#############################
-# SUPONE QUE HAY DOS O CLASES DE NOMBRES DE IMAGEN, QUE UNO ES EL DE LAS BANDAS COMUNES (1 a 5, y 7) Y OTRO EL DE LAS DE TEMPERATURA Y PANCROMATICA (6.1, 6.2 y/o 8):
-# 	Comunes: LE72280852012361EDC00_B1.TIF 	...	LE72280852012361EDC00_B5.TIF
-#	Otras: LE72270852013036EDC00_B6_VCID_1.TIF	... LE72270852013036EDC00_B6_VCID_1.TIF
-
-# SUPONE QUE PARA LAS BANDAS DE INTERES (1 a 5, y 7) EL NOMBRE ES MAS CORTO QUE PARA LAS DEMAS
-#	=> SELECCIONA EL TAMANYO DE NOMBRE MAS CHICO:
-tamanyo_preferido = 99999999999
-for i in dic_imagenes:
-	if len(i) < tamanyo_preferido:
-		tamanyo_preferido = len(i)
-
-# CREAR LISTA CON EL NOMBRE DE CADA ESCENA, SIN LA PARTE VARIABLE DE NUMERO DE BANDA:
-nombre_escenas = []
-for i in dic_imagenes:
-	if len(i) == tamanyo_preferido:
-		nombre_escenas.append(i[:pos[0]] + i[pos[0]+pos[1]:])
-
-nombre_escenas = list(set(nombre_escenas))
-nombre_escenas.sort()
-
-################################
-
-# PARA CADA ESCENA, SELECCIOANR LAS BANDAS DESEADAS Y ARMAR EL STACK:
-for i in nombre_escenas:
+def setImagenes (lista_imagenes):
+	""" 
+	Crea un set de imagenes unicas dao un diccionario o una tupla de imagenes de un directorio 
 	
-	destino = ruta_resultados + '/' + i
+	Argumentos
+	------------------------------
+	lista_imagenes: iterable con todos los noombres de las imagenes del directorio para crear el set
+	"""
+	nombre_escenas = []
+	for imagen in lista_imagenes:
+		nombre_escenas.append(imagen.split('_')[0])
+	return list(set(nombre_escenas))
+
+def filtrarArchivosImagenes (ruta):
+	""" Devuelve los archivos de imagen que terminan en una 
+	extension determinada listada en la lista de extensiones 
+	dada una ruta al directorio de trabajo 
 	
-	rutas_bandas = []
-	for b in bandas:
-		nombanda = i[:pos[0]] + str(b) + i[pos[0]+pos[1]-1:]
-		rutas_bandas.append(dic_imagenes[nombanda])
+	Argumentos
+	---------------------
+	ruta: ruta al directorio de trabajo
+	"""
 	
+	extensiones = ['*.TIF', '*.TIFF', '*.tiff', '*.tif']	
+	lista_archivos = []
+	for ext in extensiones:
+		lista_archivos.extend(filtroArchivos(ext))
+	return lista_archivos
+
+def procesarEscena (escena):
+	""" 
+	Procesa una escena dado el nombre que debe tener, se encarga de filtrar las escenas y las bandas correspondientes 
+	
+	Argumentos
+	---------------------
+	escena: nombre de la escena a procesar, generalmente viene de la lista de escenas de la funcoin anterior
+	"""
+		
+	destino = os.path.join(ruta_resultados, escena)
+	
+	regex = ''.join([escena,'_B[',bandas,']????'])
+	rutas_bandas = sorted(glob.glob(regex))
+
 	stack_job(destino, rutas_bandas)
 
 
+if __name__ == '__main__':
+	
+	ruta_actual = sys.argv[1]
+	ruta_resultados = sys.argv[2]
+	bandas = sys.argv[3]
+	
+	##cambia la ejecucion al directorio deseado
+	os.chdir(ruta_actual)
+	
+	lista_archivos = filtrarArchivosImagenes(ruta_actual)
+	nombre_escenas = setImagenes(lista_archivos)
+	print nombre_escenas
+	
+	for escena in nombre_escenas:
+		procesarEscena(escena)
