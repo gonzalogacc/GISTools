@@ -30,7 +30,7 @@ def filtroRutas (ruta):
 
 def refabricarNombre (archivo_entrada, archivo_salida):
 	"""
-	Devuelve una fuente probable de la imagen dado un nombre de archivo
+	Devuelve las posiciones de los elemnetos en la imagen segun la fuente matchenado con las regex
 	
 	Argumentos
 	----------------------------
@@ -39,7 +39,7 @@ def refabricarNombre (archivo_entrada, archivo_salida):
 	## seria mejor ponerlo de a pares sin importar la fuente asi la exp es la key y el diccionario tiene las posiciones
 	expresiones_regulares = {'.*LANDSAT_[12]_MSS_[0-9]{8,}_[0-9]{3,}_[0-9]{3,}_L[1-8]_BAND[1-7].*': {'fecha':[], 'path':[], 'row':[]}, 
 							'L[1-7]{1,}[0-9]{6,}_[0-9]{3,}[12][09][0-9]{2,}[01][0-9][0123][0-9]_B[1-7].*': {'fecha':[], 'path':[], 'row':[]}, 
-							'otra expresion regular':''} ## diccionario de las expresiones regulares con su respectiva fuente
+							'L[1-7][0-9][12][0-9]{2,}[0-3][0-9]{2,}_[0-9]{11,}_B[1-6][01].*': {'fecha':[], 'path':[], 'row':[]},} ## diccionario de las expresiones regulares con su respectiva fuente
 	
 	
 	
@@ -47,8 +47,8 @@ if __name__ == '__main__':
 	imagenes = filtroRutas('/home/lart/Escritorio/imagenes_origenes/')
 	
 	for imagen in imagenes:
-		## L71223082_08220110831_B40.TIF
-		reg2 = re.compile('L[1-7][0-9][0-9].*')
+		## LE72270852013084EDC00_B4.TIF
+		reg2 = re.compile('LE.*')
 		##reg2 = re.compile('.*LE.*')
 		
 		## Para machear solo me tengo que quedar con la ultima parte de la ruta qe corresponde al nombre del archivo 
