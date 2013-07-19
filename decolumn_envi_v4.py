@@ -1,4 +1,3 @@
-
 ########################################################################
 ##
 ## Decolumn version 4
@@ -14,11 +13,12 @@ def levantarArchivo (archivo_entrada, archivo_salida):
 	
 	argumentos:
 	-----------
-	ruta_archivo: ruta al archivo a procesar
+	archivo_entrada: ruta al archivo a procesar
+	archivo_salida: ruta del archivo destino
 	
 	devuelve:
-	lista: lista de listas con los valores por linea
-	encabezado: 
+	------------
+	0 --> deja el archivo creado en el directorio
 	"""
 	csv_entrada=csv.reader(open(archivo_entrada,'rb'), delimiter='|', dialect='excel')
 	csv_salida=csv.writer(open(archivo_salida, 'wb'))
