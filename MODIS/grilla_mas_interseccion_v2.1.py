@@ -18,6 +18,10 @@ python grilla_mas_interseccion_v2.1.py <shape_mascara> <shape_salida> <umbral_co
 0.75																	# umbral de completud de pixel
 926.625433139															# tamanyo de pixel en x e y (x=y)
 id_lote																	# nombre del campo que se quiere agregar al shape final
+
+Ejemplos de tamanyo de pixel MODIS:
+MOD13A2 = 926.625433139
+MOD13Q1 = 231.656358263958
 """
 
 from osgeo import ogr
